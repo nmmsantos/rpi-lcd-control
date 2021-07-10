@@ -23,17 +23,24 @@ print("Timing %d ms" % (timing / 1000))
 ison = True
 run([vcgencmd, "display_power", "1"], shell=False, check=True)  # nosec
 countdown = 0
+distances = [0, 0, 0]
 
 try:
     while True:
         distance = tof.get_distance()
 
         if distance > 0:
-            if distance < 6000:
+            distances[0] = distances[1]
+            distances[1] = distances[2]
+            distances[2] = distance
+            dmean = sum(distances) // 3
+
+            if dmean < 2800:
                 countdown = 0
 
                 if not ison:
                     ison = True
+                    print(distances)
                     run([vcgencmd, "display_power", "1"], shell=False, check=True)  # nosec
             else:
                 if ison:
